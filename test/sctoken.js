@@ -1,10 +1,13 @@
 var TokenFactory = artifacts.require("TokenFactory");
+var CertificateFactory = artifacts.require("CertificateFactory");
 var SCToken = artifacts.require("SCToken");
+var Certificate = artifacts.require("Certificate");
 
 contract('SCToken', function(accounts) {
   var woodToken;
   var glueToken;
   var tableToken;
+  var certificate;
 
   it("should mint wood tokens", function() {
     return TokenFactory.deployed().then((factory) => {
@@ -15,7 +18,7 @@ contract('SCToken', function(accounts) {
     }).then(() => {
       return woodToken.totalSupply.call({from: accounts[0]});
     }).then((supply) => {
-      assert.equal(supply.valueOf(), 1, "Token ha not been minted");
+      assert.equal(supply.valueOf(), 1, "Token has not been minted");
     })
   });
 
@@ -28,7 +31,7 @@ contract('SCToken', function(accounts) {
     }).then(() => {
       return glueToken.totalSupply.call({from: accounts[0]});
     }).then((supply) => {
-      assert.equal(supply.valueOf(), 1, "Token ha not been minted");
+      assert.equal(supply.valueOf(), 1, "Token has not been minted");
     })
   });
 
@@ -65,7 +68,58 @@ contract('SCToken', function(accounts) {
     }).then(() => {
       return tableToken.totalSupply.call({from: accounts[0]});
     }).then((supply) => {
-      assert.equal(supply.valueOf(), 1, "Token ha not been minted");
+      assert.equal(supply.valueOf(), 1, "Token has not been minted");
     });
   });
+
+  it("should certify wood", function() {
+    return CertificateFactory.deployed().then((factory) => {
+      return factory.createCertificate("FSC", {from: accounts[0]});
+    }).then((instance) => {
+      certificate = Certificate.at(instance.logs[0].args["contract_address"]);
+      return certificate.certifyGood(woodToken.address, {from: accounts[0]});
+    }).then(() => {
+      return certificate.hasGood(woodToken.address, {from: accounts[0]});
+    }).then((result) => {
+      assert.isTrue(result);
+    });
+  });
+
+  it("should mint table tokens with certificate", function() {
+    let factory;
+    let woodTokenId;
+    let glueTokenId;
+
+    return TokenFactory.deployed().then((result) => {
+      factory = result;
+      return woodToken.tokenByIndex.call(0, {from: accounts[0]});
+    }).then((result) => {
+      woodTokenId = result;
+      return glueToken.tokenByIndex.call(0, {from: accounts[0]});
+    }).then((result) => {
+      glueTokenId = result;
+      return factory.createToken(
+        "table",
+        "n--n",
+        [certificate.address, glueToken.address],
+        [1,2]);
+    }).then((instance) => {
+      tableToken = SCToken.at(instance.logs[0].args["contract_address"]);
+      return woodToken.approve(tableToken.address, woodTokenId);
+    }).then(() => {
+      return glueToken.approve(tableToken.address, glueTokenId);
+    }).then(() => {
+      return tableToken.mint(
+        1,
+        [woodToken.address, glueToken.address],
+        [woodTokenId, glueTokenId],
+        [1,2],
+        {from: accounts[0]});
+    }).then(() => {
+      return tableToken.totalSupply.call({from: accounts[0]});
+    }).then((supply) => {
+      assert.equal(supply.valueOf(), 1, "Token has not been minted");
+    });
+  });
+
 })

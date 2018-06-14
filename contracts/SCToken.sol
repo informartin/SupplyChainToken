@@ -1,6 +1,7 @@
 pragma solidity ^0.4.23;
 
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
+import "./Certificate.sol";
 
 contract SCToken is ERC721Token {
   using SafeMath for uint256;
@@ -42,10 +43,11 @@ contract SCToken is ERC721Token {
         abi.encodePacked(_components, _tokenIds, _amounts, msg.sender, now)));
 
     // Reduce all input components according to the used amounts
-    // TODO: Take care of certificates
     for(uint i = 0; i < components.length; i++) {
       // Ensure the required amounts of input components was used and reduce
       require(_quantity * _amounts[i] >= amounts[i]);
+      if(_components[i] != components[i])
+        require(Certificate(components[i]).hasGood(_components[i]));
       SCToken(_components[i]).reduceContent(_tokenIds[i],_amounts[i]);
     }
 
