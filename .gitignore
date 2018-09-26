@@ -16,3 +16,5 @@ config/test/contracts.json
 build
 dist
 .DS_Store
+
+measurements
