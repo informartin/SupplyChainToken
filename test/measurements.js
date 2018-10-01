@@ -6,13 +6,16 @@ var Certificate = artifacts.require("Certificate");
 var BigNumber = require('bignumber.js');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
+const deployment_iterations = 50;
+const increase_supply_iterations = 50;
+
 contract('SCToken', function(accounts) {
 
     it("measure deployment cost", async function() {
       var factory = await TokenFactory.deployed();
       var gas_costs = [];
 
-      for(i = 0; i < 50; i++) {
+      for(i = 0; i < deployment_iterations; i++) {
 
         var inputAddresses = [];
         var inputAmounts = [];
@@ -55,9 +58,8 @@ contract('SCToken', function(accounts) {
       var batches_uid = [];
       var amounts = [];
       var gas_costs = [];
-      var iterations = 0;
       factory = await TokenFactory.deployed();
-      for (i = 0; i < iterations; i++) {
+      for (i = 0; i < increase_supply_iterations; i++) {
         //let contract_addresses = tokens.map((c_address) => c_address.slice(0,42));
         //let batches_uid = tokens.map((c_address) => "0x".concat(c_address.slice(42,c_address.length)));
         let token = await factory.createToken(
@@ -68,12 +70,13 @@ contract('SCToken', function(accounts) {
           {from: accounts[0]}
         );
         let address = token.logs[0]["args"]["contract_address"];
+        console.log(i+1, ". contract address: ", address);
         for (j = 0; j < contract_addresses.length; j++) {
           let inst = await SCToken.at(contract_addresses[j]);
           await inst.approve(address, batches_uid[j], {from: accounts[0]});
         }
         let tokenInstance = await SCToken.at(address);
-        let batchResult = await tokenInstance.mint(iterations-i, contract_addresses, batches_uid, amounts, {from: accounts[0]});
+        let batchResult = await tokenInstance.mint(increase_supply_iterations-i, contract_addresses, batches_uid, amounts, {from: accounts[0]});
         let batch_uid = await tokenInstance.tokenByIndex.call(0, {from: accounts[0]});
         contract_addresses.push(address);
         batches_uid.push(batch_uid);

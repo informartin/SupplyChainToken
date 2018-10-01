@@ -53,6 +53,7 @@ contract SCToken is ERC721Token {
 
     _mint(msg.sender, tokenId);
     contentAmount[tokenId] = _quantity;
+    emit Mint(tokenId, _components, _tokenIds, _amounts, now);
   }
 
   function reduceContent(uint256 _tokenId, uint256 _amount) public canTransfer(_tokenId) {
@@ -73,4 +74,12 @@ contract SCToken is ERC721Token {
   function tokenContent(uint256 _tokenId) public view returns (uint256) {
     return contentAmount[_tokenId];
   }
+
+  event Mint(
+    uint256 indexed batchId,
+    address[] source_components,
+    uint256[] source_batches,
+    uint256[] source_amounts,
+    uint timestamp
+  );
 }
