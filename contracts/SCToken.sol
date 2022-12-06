@@ -15,8 +15,14 @@ contract SCToken is ERC721Token {
   // Amounts of that component that are required for generating a token
   uint256[] amounts;
 
+  // Link to an external Storage such as IPFS using its hash
+  bytes32 externalInfo;
+
   // Mapping that stores the amount contained in one batch (NF token)
   mapping(uint256 => uint256) contentAmount;
+
+  // Mapping that stores links to external information for each batch
+  mapping(uint256 => bytes32) externalBatchInfo;
 
   modifier onlyContractOwner() {
     require(msg.sender == owner);
@@ -73,6 +79,22 @@ contract SCToken is ERC721Token {
 
   function tokenContent(uint256 _tokenId) public view returns (uint256) {
     return contentAmount[_tokenId];
+  }
+
+  function setExternalInfo(bytes32 link) public onlyContractOwner {
+    externalInfo = link;
+  }
+
+  function getExternalInfo() public constant returns (bytes32) {
+    return externalInfo;
+  }
+
+  function setExternalInfoForToken(uint256 _tokenId, bytes32 link) public canTransfer(_tokenId) {
+    externalBatchInfo[_tokenId] = link;
+  }
+
+  function getExternalInfoForToken(uint256 _tokenId) public constant returns (bytes32) {
+    return externalBatchInfo[_tokenId];
   }
 
   event Mint(
