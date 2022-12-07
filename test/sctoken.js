@@ -12,8 +12,8 @@ contract('SCToken', function(accounts) {
   it("should mint wood tokens", function() {
     return TokenFactory.deployed().then((factory) => {
       return factory.createToken("wood", "===", [], [], {from: accounts[0]});
-    }).then((instance) => {
-      woodToken = SCToken.at(instance.logs[0].args["contract_address"]);
+    }).then(async (instance) => {
+      woodToken = await SCToken.at(instance.logs[0].args["contract_address"]);
       return woodToken.mint(100, [], [], [], {from: accounts[0]});
     }).then(() => {
       return woodToken.totalSupply.call({from: accounts[0]});
@@ -25,8 +25,8 @@ contract('SCToken', function(accounts) {
   it("should mint glue tokens", function() {
     return TokenFactory.deployed().then((factory) => {
       return factory.createToken("glue", "=>", [], [], {from: accounts[0]});
-    }).then((instance) => {
-      glueToken = SCToken.at(instance.logs[0].args["contract_address"]);
+    }).then(async (instance) => {
+      glueToken = await SCToken.at(instance.logs[0].args["contract_address"]);
       return glueToken.mint(200, [], [], [], {from: accounts[0]});
     }).then(() => {
       return glueToken.totalSupply.call({from: accounts[0]});
@@ -53,8 +53,8 @@ contract('SCToken', function(accounts) {
         "n--n",
         [woodToken.address, glueToken.address],
         [1,2]);
-    }).then((instance) => {
-      tableToken = SCToken.at(instance.logs[0].args["contract_address"]);
+    }).then(async (instance) => {
+      tableToken = await SCToken.at(instance.logs[0].args["contract_address"]);
       return woodToken.approve(tableToken.address, woodTokenId);
     }).then(() => {
       return glueToken.approve(tableToken.address, glueTokenId);
@@ -75,8 +75,8 @@ contract('SCToken', function(accounts) {
   it("should certify wood", function() {
     return CertificateFactory.deployed().then((factory) => {
       return factory.createCertificate("FSC", {from: accounts[0]});
-    }).then((instance) => {
-      certificate = Certificate.at(instance.logs[0].args["contract_address"]);
+    }).then(async (instance) => {
+      certificate = await Certificate.at(instance.logs[0].args["contract_address"]);
       return certificate.certifyGood(woodToken.address, {from: accounts[0]});
     }).then(() => {
       return certificate.hasGood(woodToken.address, {from: accounts[0]});
@@ -103,8 +103,8 @@ contract('SCToken', function(accounts) {
         "n--n",
         [certificate.address, glueToken.address],
         [1,2]);
-    }).then((instance) => {
-      tableToken = SCToken.at(instance.logs[0].args["contract_address"]);
+    }).then(async (instance) => {
+      tableToken = await SCToken.at(instance.logs[0].args["contract_address"]);
       return woodToken.approve(tableToken.address, woodTokenId);
     }).then(() => {
       return glueToken.approve(tableToken.address, glueTokenId);

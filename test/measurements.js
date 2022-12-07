@@ -1,13 +1,10 @@
 var TokenFactory = artifacts.require("TokenFactory");
-var CertificateFactory = artifacts.require("CertificateFactory");
 var SCToken = artifacts.require("SCToken");
-var Certificate = artifacts.require("Certificate");
 
-var BigNumber = require('bignumber.js');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const deployment_iterations = 50;
-const increase_supply_iterations = 50;
+const deployment_iterations = 1;
+const increase_supply_iterations = 1;
 
 contract('SCToken', function(accounts) {
 
