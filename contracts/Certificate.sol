@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.5.0;
 
 contract Certificate {
 
@@ -8,7 +8,7 @@ contract Certificate {
 
     mapping (address => bool) certifiedGoods; //Not sure if a mapping a good idea...
 
-    constructor(address _owner, string _description) public {
+    constructor(address _owner, string memory _description) public {
         owner = _owner;
         description = _description;
     }
@@ -28,15 +28,15 @@ contract Certificate {
         emit RemoveCertifiedGood(contract_address);
     }
 
-    function hasGood(address contract_address) public constant returns (bool) {
+    function hasGood(address contract_address) public view returns (bool) {
         return certifiedGoods[contract_address];
     }
 
-    function getDescription() public constant returns (string) {
+    function getDescription() public view returns (string memory) {
         return description;
     }
 
-    function getOwner() public constant returns (address) {
+    function getOwner() public view returns (address) {
         return owner;
     }
 

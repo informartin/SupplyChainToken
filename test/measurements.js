@@ -22,11 +22,9 @@ contract('SCToken', function(accounts) {
           inputAmounts.push(10);
         }
         let contract = await factory.createToken(
-                            "wood",
-                            "===",
-                            inputAddresses,
-                            inputAmounts,
-                            {from: accounts[0]});
+          inputAddresses,
+          inputAmounts,
+          {from: accounts[0]});
         gas_costs.push({
           number: i,
           gas_costs: contract.receipt.cumulativeGasUsed

@@ -15,6 +15,9 @@
   "dependencies": {
     "bignumber.js": "^7.2.1",
     "csv-writer": "^1.2.0",
-    "openzeppelin-solidity": "1.10.0"
+    "eth-proof": "^2.1.6",
+    "ethers": "^5.7.2",
+    "ethers-utils": "^2.1.11",
+    "openzeppelin-solidity": "2.1.1"
   }
 }
