@@ -86,8 +86,9 @@ contract('SCToken', function(accounts) {
       blockHashes = [];
       receiptProofs =  [];
       rlpBlocks = [];
+      let cumulative_gas = 0;
 
-      var startTime = performance.now()
+      var cumStartTime = performance.now();
 
       for (j = 0; j < contract_addresses.length; j++) {
         let inst = await SCToken.at(contract_addresses[j]);
@@ -98,7 +99,7 @@ contract('SCToken', function(accounts) {
           1
         );
         await relay.storeHeaderHash(receipt.receipt.blockHash, {from: accounts[0]});
-
+        cumulative_gas += receipt["receipt"]["cumulativeGasUsed"];
         const block = await web3.eth.getBlock(receipt.receipt.blockHash);
         blockHashes.push(block.hash);
         const pr = await prover.receiptProof(receipt.tx);
@@ -107,6 +108,7 @@ contract('SCToken', function(accounts) {
         // await inst.approve(address, batches_uid[j], {from: accounts[0]});
       }
       let tokenInstance = await SCToken.at(address);
+      var startTime = performance.now();
       let batchResult = await tokenInstance.mint(
         increase_supply_iterations-i,
         blockHashes,
@@ -116,6 +118,7 @@ contract('SCToken', function(accounts) {
         receiptProofs.map(proof => proof.witness),
         Array(blockHashes.length).fill(1)
       )
+      var cumEndTime = performance.now()
       var endTime = performance.now()
       // let batchResult = await tokenInstance.mint(increase_supply_iterations-i, contract_addresses, batches_uid, amounts, {from: accounts[0]});
       // let batch_uid = await tokenInstance.tokenByIndex.call(0, {from: accounts[0]});
@@ -127,7 +130,9 @@ contract('SCToken', function(accounts) {
       results.push({
         number: i,
         gas_costs: batchResult["receipt"]["cumulativeGasUsed"],
-        time: endTime - startTime
+        cumulative_gas: cumulative_gas + batchResult["receipt"]["cumulativeGasUsed"],
+        time: endTime - startTime,
+        cumulative_time: cumEndTime - cumStartTime
       });
     }
     
@@ -140,7 +145,9 @@ contract('SCToken', function(accounts) {
           header: [
               {id: 'number', title: 'NUMBER'},
               {id: 'gas_costs', title: 'GAS_COSTS'},
-              {id: 'time', title: 'TIME_MS'}
+              {id: 'cumulative_gas', title: 'CUMULATIVE_GAS_COSTS'},
+              {id: 'time', title: 'TIME_MS'},
+              {id: 'cumulative_time', title: 'CUMULATIVE_TIME_MS'}
           ]
       });
 
