@@ -4,8 +4,8 @@ var SCToken = artifacts.require("SCToken");
 var Certificate = artifacts.require("Certificate");
 var Relay = artifacts.require("Relay");
 
-const { BigNumber, RLP } = require("ethers-utils");
-const { GetProof, VerifyProof } = require("eth-proof");
+const { RLP } = require("ethers-utils");
+const { GetProof } = require("eth-proof");
 
 const jsonRpcUrl = "http://localhost:7545"
 const prover = new GetProof(jsonRpcUrl);

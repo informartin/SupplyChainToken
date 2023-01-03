@@ -58,7 +58,7 @@ contract SCToken is ERC721, EventProof {
     bytes[] memory receiptWitness,
     uint256[] memory _amounts
   ) public onlyContractOwner {
-    for(uint i = 1; i < components.length; i++) {
+    for(uint i = 0; i < components.length; i++) {
       require(Relay(sourceBlockchainRelayAddresses[i]).isHeaderHashStored(trustedBlockhash[i]), "Header not stored in Relay");
       require(
         proveReceiptInclusion(
