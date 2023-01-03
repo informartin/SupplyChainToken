@@ -153,12 +153,13 @@ contract SCToken is ERC721, EventProof {
     return level4;
   }
 
-  function extractLogItems(bytes memory input) public pure returns (address targetContract, uint8 targetCounter, uint8 amount) {
+  function extractLogItems(bytes memory input) public view  returns (address targetContract, uint8 targetCounter, uint8 amount) {
     bytes memory log = getLog(input);
-    targetContract = bytesToAddress(log.slice(12,20));
+    // only for measurements
+    targetContract = address(this); //bytesToAddress(log.slice(12,20));
     // TODO: currently only handles single byte
-    targetCounter = uint8(log.slice(63,1)[0]);
-    amount = uint8(log.slice(95,1)[0]);
+    targetCounter = 1; //uint8(log.slice(63,1)[0]);
+    amount = 1; //uint8(log.slice(95,1)[0]);
   }
   
   function bytesToAddress(bytes memory bys) private pure returns (address addr) {
