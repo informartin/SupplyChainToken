@@ -11,6 +11,8 @@ const increase_supply_iterations = 10;
 
 contract('SCToken', function(accounts) {
 
+    var results = [];
+
     it("measure deployment cost", async function() {
       var factory = await TokenFactory.deployed();
       var gas_costs = [];
@@ -57,7 +59,6 @@ contract('SCToken', function(accounts) {
       var contract_addresses = [];
       var batches_uid = [];
       var amounts = [];
-      var gas_costs = [];
       factory = await TokenFactory.deployed();
       for (i = 0; i < increase_supply_iterations; i++) {
         //let contract_addresses = tokens.map((c_address) => c_address.slice(0,42));
@@ -71,31 +72,40 @@ contract('SCToken', function(accounts) {
         );
         let address = token.logs[0]["args"]["contract_address"];
         console.log(i+1, ". contract address: ", address);
+
+        var startTime = performance.now();
+
         for (j = 0; j < contract_addresses.length; j++) {
           let inst = await SCToken.at(contract_addresses[j]);
           await inst.approve(address, batches_uid[j], {from: accounts[0]});
         }
         let tokenInstance = await SCToken.at(address);
         let batchResult = await tokenInstance.mint(increase_supply_iterations-i, contract_addresses, batches_uid, amounts, {from: accounts[0]});
+        var endTime = performance.now();
         let batch_uid = await tokenInstance.tokenByIndex.call(0, {from: accounts[0]});
         contract_addresses.push(address);
         batches_uid.push(batch_uid);
         amounts.push(1);
-        gas_costs.push({
+        results.push({
           number: i,
-          gas_costs: batchResult["receipt"]["cumulativeGasUsed"]
+          gas_costs: batchResult["receipt"]["cumulativeGasUsed"],
+          time: endTime - startTime
         });
       }
-      if(gas_costs.length > 0) {
+    });
+
+    it("should store results", () => {
+      if(results.length > 0) {
         const csvWriter = createCsvWriter({
             path: 'measurements/erc721_creation_costs.csv',
             header: [
                 {id: 'number', title: 'NUMBER'},
-                {id: 'gas_costs', title: 'GAS_COSTS'}
+                {id: 'gas_costs', title: 'GAS_COSTS'},
+                {id: 'time', title: 'TIME_MS'}
             ]
         });
-
-        csvWriter.writeRecords(gas_costs)
+  
+        csvWriter.writeRecords(results)
           .then(() => {
               console.log('CSV written');
           });
