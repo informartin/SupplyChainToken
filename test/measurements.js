@@ -7,7 +7,7 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const { GetProof } = require("eth-proof");
 
 const deployment_iterations = 1;
-const increase_supply_iterations = 50;
+const increase_supply_iterations = 5;
 
 const jsonRpcUrl = "http://localhost:7545"
 const prover = new GetProof(jsonRpcUrl);
@@ -127,7 +127,7 @@ contract('SCToken', function(accounts) {
       results.push({
         number: i,
         gas_costs: batchResult["receipt"]["cumulativeGasUsed"],
-        timeMs: endTime - startTime
+        time: endTime - startTime
       });
     }
     
@@ -139,7 +139,8 @@ contract('SCToken', function(accounts) {
           path: 'measurements/erc721_creation_costs.csv',
           header: [
               {id: 'number', title: 'NUMBER'},
-              {id: 'gas_costs', title: 'GAS_COSTS'}
+              {id: 'gas_costs', title: 'GAS_COSTS'},
+              {id: 'time', title: 'TIME_MS'}
           ]
       });
 
