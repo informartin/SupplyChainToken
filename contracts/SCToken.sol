@@ -40,7 +40,7 @@ contract SCToken is ERC721Token {
     // Generate token ID (maybe more enthropy would be good)
     uint256 tokenId = uint256(
       keccak256(
-        abi.encodePacked(_components, _tokenIds, _amounts, msg.sender, now)));
+        abi.encodePacked(_quantity, _components, _tokenIds, _amounts, msg.sender, now)));
 
     // Reduce all input components according to the used amounts
     for(uint i = 0; i < components.length; i++) {
