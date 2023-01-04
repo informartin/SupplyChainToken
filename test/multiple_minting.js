@@ -9,6 +9,8 @@ contract('SCToken', function(accounts) {
         const instance = await factory.createToken("wood", "===", [], [], {from: accounts[0]});
         woodToken = await SCToken.at(instance.logs[0].args["contract_address"]);
 
+        console.log('Token address: ', woodToken.address);
+
         let tokenPromises = [];
         for(i = 0; i < iterations; i++) {
             tokenPromises.push(woodToken.mint(i, [], [], [], {from: accounts[0]}));
